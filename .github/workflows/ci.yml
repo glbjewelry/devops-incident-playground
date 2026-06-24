@@ -1,0 +1,25 @@
+name: CI
+
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+
+jobs:
+    test-and-build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Download repository
+              uses: actions/checkout@v4
+
+            - name: Check Python syntax
+              run: |
+                  python3 -m py_compile app/main.py
+                  python3 -m py_compile app/worker.py
+
+            - name: Build Docker image
+              run: docker build -t incident-playground:test ./app
