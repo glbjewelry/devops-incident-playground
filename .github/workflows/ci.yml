@@ -20,6 +20,7 @@ jobs:
               run: |
                   python3 -m py_compile app/main.py
                   python3 -m py_compile app/worker.py
+                  python3 -m py_compile tests/test_api.py
 
             - name: Build Docker image
               run: docker build -t incident-playground:test ./app
