@@ -5,22 +5,43 @@ A small DevOps portfolio project with a Python API, background worker, Docker Co
 ## Architecture
 
 ```text
-client -> localhost:8098 -> nginx -> app:8000
-                                  
-                                  |
-                                  v
-                            
-                            jobs-data volume
-                                  
-                                  ^
-                                  |
-                               worker
+                         GitHub Actions CI
+                                |
+                                v
+                    build image + start compose stack
+                                |
+                                v
+  client -> localhost:8098 -> nginx -> app:8000
+                                |
+                                v
+                         jobs-data volume
+                                ^
+                                |
+                             worker
+
+    
+
+
+app:/metrics -> prometheus:9090 -> grafana:3000 -> alerts
 ```
 
-## descript:
+## services:
 app      Python API service
 worker   background job processor
 nginx    reverse proxy exposed on localhost:8098
+prometheus   metrics collector scraping app:/metrics
+grafana      dashboards and alerting UI exposed on localhost:3000
+
+## CI/CD:
+
+GitHub Actions pipeline:
+1. checks Python syntax
+2. builds Docker image
+3. starts Docker Compose stack
+4. waits for /health
+5. runs API smoke tests
+6. prints container status
+7. stops Docker Compose stack
 
 ##endpoints: 
 GET  /                service info
