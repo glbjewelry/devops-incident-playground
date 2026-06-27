@@ -24,3 +24,28 @@ jobs:
 
             - name: Build Docker image
               run: docker build -t incident-playground:test ./app
+
+            - name: START Stack
+              run: docker compose up -d --build
+
+            - name: WAIT for API
+              run: |
+                  for i in {1..30}; do
+                      if curl -fsS http://localhost:8098/health; then
+                          exit 0
+                      fi
+                      sleep 2
+                  done
+                  docker compose logs
+                  exit 1
+
+            - name: Run API SMOOOKE tests
+              run: python3 tests/test_api.py
+
+            - name: SHOW container status
+              if: always()
+              run: docker compose ps
+
+            - name: STOP Stack
+              if: always()
+              run: docker compose down
